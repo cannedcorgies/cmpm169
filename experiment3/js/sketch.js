@@ -1,67 +1,88 @@
-// sketch.js - purpose and description here
-// Author: Your Name
-// Date:
+let standardFramerate = 60;
+let slowedFramerate = 7;
 
-// Here is how you might set up an OOP p5.js project
-// Note that p5.js looks for a file called sketch.js
+let pixelIndexMultiplier = 4;
 
-// Constants - User-servicable parts
-// In a longer project I like to put these in a separate file
-const VALUE1 = 1;
-const VALUE2 = 2;
+let canvasX = 400;
+let canvasY = 400;
 
-// Globals
-let myInstance;
-let canvasContainer;
+let firstLinePos = 0;            //  tv line
+let secondLinePos = -canvasY/2;  //  following one 
+let lineSpeed = 3;
 
-class MyClass {
-    constructor(param1, param2) {
-        this.property1 = param1;
-        this.property2 = param2;
-    }
+let frameSize = 100;
 
-    myMethod() {
-        // code to run when method is called
-    }
-}
+let osc; // sound oscillator
 
-// setup() function is called once when the program starts
 function setup() {
-    // place our canvas, making it fit our container
-    canvasContainer = $("#canvas-container");
-    let canvas = createCanvas(canvasContainer.width(), canvasContainer.height());
-    canvas.parent("canvas-container");
-    // resize canvas is the page is resized
-    $(window).resize(function() {
-        console.log("Resizing...");
-        resizeCanvas(canvasContainer.width(), canvasContainer.height());
-    });
-    // create an instance of the class
-    myInstance = new MyClass(VALUE1, VALUE2);
+  createCanvas(canvasX, canvasY);
+  pixelDensity(1);
 
-    var centerHorz = windowWidth / 2;
-    var centerVert = windowHeight / 2;
+  osc = new p5.Oscillator();
+  osc.setType('sine');        // start at 0, then oscillate up and down
+  osc.start();
 }
 
-// draw() function is called repeatedly, it's the main animation loop
 function draw() {
-    background(220);    
-    // call a method on the instance
-    myInstance.myMethod();
+  
+  //// ==== SLOWDOWN ====
+  if (mouseIsPressed) {
+    frameRate(slowedFramerate);
+  } else {
+    frameRate(standardFramerate);
+  }
 
-    // Put drawings here
-    var centerHorz = canvasContainer.width() / 2 - 125;
-    var centerVert = canvasContainer.height() / 2 - 125;
-    fill(234, 31, 81);
-    noStroke();
-    rect(centerHorz, centerVert, 250, 250);
-    fill(255);
-    textStyle(BOLD);
-    textSize(140);
-    text("p5*", centerHorz + 10, centerVert + 200);
-}
+  //// ==== STATIC GENERATION ====
+  //clear();
+  loadPixels();
 
-// mousePressed() function is called once after every time a mouse button is pressed
-function mousePressed() {
-    // code to run when mouse is pressed
+  for (let y = 0; y < height; y++) {
+    
+    for (let x = 0; x < width; x++) {
+      
+      let index = (x + y * width) * pixelIndexMultiplier;
+      let randomColor = random(255);
+      pixels[index + 0] = randomColor;  // blue
+      pixels[index + 1] = randomColor;  // red
+      pixels[index + 2] = randomColor;  // yellow
+      pixels[index + 3] = 255;          // transparency/alpha
+      
+    }
+    
+  }
+
+  updatePixels();
+  
+  //// ==== LINE GENERATION ====
+  stroke(0, 0, 0);
+  line(0, firstLinePos, canvasY, firstLinePos);
+  firstLinePos += lineSpeed;
+  if (firstLinePos>canvasY) { firstLinePos = 0; }
+  
+  line(0, secondLinePos, canvasX, secondLinePos);
+  secondLinePos += lineSpeed;
+  if (secondLinePos>canvasY) { secondLinePos = 0; }
+  
+  //// ==== MUSIC FRAME ====
+  noFill();
+  stroke(255, 0, 0); 
+  rect(mouseX, mouseY, frameSize, frameSize);
+
+  //// ==== SOUND GENERATION ====
+  // further right and further down, higher the pitch
+  let frequency = map(mouseX + mouseY, 0, height, 100, 1000);
+
+  // check pixels touching square
+  for (let y = mouseY; y < mouseY + frameSize; y++) {
+    
+    for (let x = mouseX; x < mouseX + frameSize; x++) {
+      
+      let index = (x + y * width) * pixelIndexMultiplier;
+      let darkness = 255 - pixels[index]; // get darkness from pixel
+      osc.freq(frequency + darkness);     // darker the pixel, higher the frequency
+      
+    }
+    
+  }
+  
 }
