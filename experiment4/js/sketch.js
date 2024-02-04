@@ -28,10 +28,10 @@ let setupComplete;
 
 function preload() {
 
-  mySounds.push(loadSound('resources/ssh_01.wav'));
-    mySounds.push(loadSound('resources/ssh_02.wav'));
-    mySounds.push(loadSound('resources/ssh_03.wav'));
-    mySounds.push(loadSound('resources/ssh_04.wav'));
+  mySounds.push(loadSound('resources/ssh_01.mp3'));
+    mySounds.push(loadSound('resources/ssh_02.mp3'));
+    mySounds.push(loadSound('resources/ssh_03.mp3'));
+    mySounds.push(loadSound('resources/ssh_04.mp3'));
 
 }
 
