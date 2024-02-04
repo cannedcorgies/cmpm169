@@ -1,3 +1,5 @@
+let movie;
+
 let mySounds = [];
 
 let strikes = 0;
