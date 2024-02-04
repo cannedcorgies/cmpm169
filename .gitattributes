@@ -1,0 +1,5 @@
+.mp4 filter=lfs diff=lfs merge=lfs -text
+experiment4/js/resources/*.mp4 filter=lfs diff=lfs merge=lfs -text
+experiment4/js/resources/** filter=lfs diff=lfs merge=lfs -text
+CMPM169/experiment4/js/resources/*.mp4 filter=lfs diff=lfs merge=lfs -text
+cmpm169/experiment4/js/resources/** filter=lfs diff=lfs merge=lfs -text
