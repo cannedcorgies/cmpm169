@@ -97,20 +97,7 @@ function draw() {
 
     TooNoisy();
 
-    // ==== STRIKE FORGIVENESS SYSTEM ====
-    if (strikes > 0) {    // if you currently have strikes..
-
-      cooldownTime += (deltaTime/1000 * (1/(strikes + 1)));   // add time scaled by strikes to cooldown
-
-      if (cooldownTime >= cooldownTimeMax) {    // if cooldown has been filled..
-
-        strikes --;         // forgive a single strike
-        cooldownTime = 0;
-        console.log("==== minus 1 - " + strikes + " ====");
-
-      }
-
-    }
+    StrikeForgiveness();
 
   } else {    // otherwise..
 
@@ -119,6 +106,10 @@ function draw() {
   }
 
 }
+
+
+
+// ==== FUNCTIONS ====
 
 // ==== mouseClicked() ====
 //  - debugging function
@@ -136,7 +127,11 @@ function mouseClicked() {
 
 }
 
-// ==== StopMoving() ====
+
+// ==== StopMoving() ==== [2]
+//  - raises an alert if too much movement
+//  - uses pixel analysis and red value tracking
+//  - returns an array of concerning pixels
 function StopMoving() {
 
   var motion = [];
@@ -187,6 +182,10 @@ function StopMoving() {
 
 }
 
+
+// ==== VizualizeMotion ==== [2]
+//  - takes in array of pixels detected in motion
+//  - highlights them on the canvas with big blocks
 function VisualizeMotion(motion) {
   for (i = 0; i < motion.length; i++) {
       
@@ -196,6 +195,7 @@ function VisualizeMotion(motion) {
     
 }
 }
+
 
 // ==== TooNoisy() ====
 //  - gives a strike if player is too noisy
@@ -211,6 +211,7 @@ function TooNoisy() {
   }
 
 }
+
 
 // ==== Strike() ====
 //  - gives user a strike
@@ -228,6 +229,7 @@ function Strike() {
   console.log("==== boy howdy, that's stike " + strikes + "! ====");
 
 }
+
 
 // ==== StrikeCooldown() ====
 //  - small invulnerability for player
@@ -253,7 +255,33 @@ function StrikeCooldown() {
 
 }
 
+
+// ==== StrikeForgiveness() ====
+//  - periodically forgives one strike
+//  - wait time for forgiveness scales with
+//    current number of strikes
+function StrikeForgiveness() {
+
+  if (strikes > 0) {    // if you currently have strikes..
+
+    cooldownTime += (deltaTime/1000 * (1/(strikes + 1)));   // add time scaled by strikes to cooldown
+
+    if (cooldownTime >= cooldownTimeMax) {    // if cooldown has been filled..
+
+      strikes --;         // forgive a single strike
+      cooldownTime = 0;
+      console.log("==== minus 1 - " + strikes + " ====");
+
+    }
+
+  }
+
+}
+
 // ==== CREDITS ====
 // Sshh.wav - jay-kelly007 [1]
 //  - https://freesound.org/s/408744/
 //  - https://creativecommons.org/licenses/by-nc/3.0/
+//
+// Motion Dection in Javascript - George Galanakis [2]
+//  - https://medium.com/hackernoon/motion-detection-in-javascript-2614adea9325
