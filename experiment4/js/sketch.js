@@ -1,88 +1,259 @@
-let standardFramerate = 60;
-let slowedFramerate = 7;
+let mySounds = [];
 
-let pixelIndexMultiplier = 4;
+let strikes = 0;
+  let strikesMax = 4;
+  let strikeTime = 0;
+  let strikeTimeMax = 3;
+  let warning = false;
 
-let canvasX = 400;
-let canvasY = 400;
+let cooldownTime = 0;
+  let cooldownTimeMax = 15;
 
-let firstLinePos = 0;            //  tv line
-let secondLinePos = -canvasY/2;  //  following one 
-let lineSpeed = 3;
+let maxVol = 0.0175;
 
-let frameSize = 100;
+let video;
+  let prevFrame;
+  let currentFrame;
+  let camSensitivity = 50;
+  let camWidth = 640;
+  let camHeight = 480;
+  let ctx;
+  let old;
+  let scalefactor;
+  let sample_size = 25;
+  let movementMax = 1000;
+  let startUp = 0;
 
-let osc; // sound oscillator
+let setupComplete;
+
+function preload() {
+
+  mySounds.push(loadSound('resources/ssh_01.wav'));
+    mySounds.push(loadSound('resources/ssh_02.wav'));
+    mySounds.push(loadSound('resources/ssh_03.wav'));
+    mySounds.push(loadSound('resources/ssh_04.wav'));
+
+}
 
 function setup() {
-  createCanvas(canvasX, canvasY);
-  pixelDensity(1);
 
-  osc = new p5.Oscillator();
-  osc.setType('sine');        // start at 0, then oscillate up and down
-  osc.start();
+  setupComplete = false;
+  
+  createCanvas(640, 480);
+
+  movie = createVideo("resources/NightOfTheLivingDead.mp4");
+    movie.play();
+
+  mic = new p5.AudioIn();
+    mic.start();
+
+  video = createCapture(VIDEO);
+    video.size(640, 480);
+    video.hide();
+    
+  // Initialize the previous frame
+  prevFrame = createImage(width, height);
+  prevFrame.loadPixels();
+  for (let i = 0; i < prevFrame.pixels.length; i += 4) {
+    prevFrame.pixels[i] = 0;
+    prevFrame.pixels[i + 1] = 0;
+    prevFrame.pixels[i + 2] = 0;
+    prevFrame.pixels[i + 3] = 255;
+  }
+  prevFrame.updatePixels();
+
+  context = canvas.getContext('2d');
+
+  old = []
+  scalefactor = 1;
+  
+  setupComplete = true;
+
 }
 
 function draw() {
-  
-  //// ==== SLOWDOWN ====
-  if (mouseIsPressed) {
-    frameRate(slowedFramerate);
-  } else {
-    frameRate(standardFramerate);
+
+  //background(0);
+
+  //context.drawImage(video, 0, 0, 640, 480);
+  image(video, 0, 0, width, height);
+
+  if (!setupComplete) { return; }
+
+  // ==== GAME OVER ====
+  if (strikes > strikesMax) {   // if exceed strikes allowed..
+
+    movie.stop();       // ..reset movie and everything else
+    movie.play();
+    strikes = 0;
+    cooldownTime = 0;
+
   }
 
-  //// ==== STATIC GENERATION ====
-  //clear();
-  loadPixels();
+  StopMoving();
 
-  for (let y = 0; y < height; y++) {
-    
-    for (let x = 0; x < width; x++) {
-      
-      let index = (x + y * width) * pixelIndexMultiplier;
-      let randomColor = random(255);
-      pixels[index + 0] = randomColor;  // blue
-      pixels[index + 1] = randomColor;  // red
-      pixels[index + 2] = randomColor;  // yellow
-      pixels[index + 3] = 255;          // transparency/alpha
-      
+  // ==== STRIKING SYSTEM =====
+  if (!warning) {   // if not invulnerable..
+
+    TooNoisy();
+
+    // ==== STRIKE FORGIVENESS SYSTEM ====
+    if (strikes > 0) {    // if you currently have strikes..
+
+      cooldownTime += (deltaTime/1000 * (1/(strikes + 1)));   // add time scaled by strikes to cooldown
+
+      if (cooldownTime >= cooldownTimeMax) {    // if cooldown has been filled..
+
+        strikes --;         // forgive a single strike
+        cooldownTime = 0;
+        console.log("==== minus 1 - " + strikes + " ====");
+
+      }
+
     }
-    
+
+  } else {    // otherwise..
+
+    StrikeCooldown();   // "iframes"
+
   }
 
-  updatePixels();
-  
-  //// ==== LINE GENERATION ====
-  stroke(0, 0, 0);
-  line(0, firstLinePos, canvasY, firstLinePos);
-  firstLinePos += lineSpeed;
-  if (firstLinePos>canvasY) { firstLinePos = 0; }
-  
-  line(0, secondLinePos, canvasX, secondLinePos);
-  secondLinePos += lineSpeed;
-  if (secondLinePos>canvasY) { secondLinePos = 0; }
-  
-  //// ==== MUSIC FRAME ====
-  noFill();
-  stroke(255, 0, 0); 
-  rect(mouseX, mouseY, frameSize, frameSize);
-
-  //// ==== SOUND GENERATION ====
-  // further right and further down, higher the pitch
-  let frequency = map(mouseX + mouseY, 0, height, 100, 1000);
-
-  // check pixels touching square
-  for (let y = mouseY; y < mouseY + frameSize; y++) {
-    
-    for (let x = mouseX; x < mouseX + frameSize; x++) {
-      
-      let index = (x + y * width) * pixelIndexMultiplier;
-      let darkness = 255 - pixels[index]; // get darkness from pixel
-      osc.freq(frequency + darkness);     // darker the pixel, higher the frequency
-      
-    }
-    
-  }
-  
 }
+
+// ==== mouseClicked() ====
+//  - debugging function
+//  - click and that's a strike
+//  - to test if striking and cooldown
+//    systems work effectively
+function mouseClicked() {
+
+  if (!warning) {
+
+    Strike();
+    movie.pause();
+
+  }
+
+}
+
+// ==== StopMoving() ====
+function StopMoving() {
+
+  var motion = [];
+  image(video, 0, 0, width, height);
+  var data = context.getImageData(0, 0, video.width, video.height).data;  // get latest frame data
+  
+  // ANALYZE ALL PIXELS
+  for (var y = 0; y < video.height; y++) {
+
+    for (var x = 0; x < video.width; x++) {
+
+      var pos = (x + y * video.width) * 4;
+
+      // separate RGB
+      var r = data[pos];
+      var g = data[pos+1];
+      var b = data[pos+2];
+
+      if(old[pos] && Math.abs(old[pos].red - r) > camSensitivity) { // if difference in red is greater than set sensitivity...
+
+        // make note of the pixel by highlighting it
+        context.fillStyle = "blue";
+        context.fillRect(x * scalefactor, y * scalefactor, scalefactor, scalefactor);
+        motion.push({x: x * scalefactor, y: y * scalefactor, r: r, g: g, b: b});
+
+      }
+
+      old[pos] = { red: r, green: g, blue: b};
+
+    }
+
+  }
+
+  if (motion.length > movementMax && !warning) {
+
+    if (startUp >= 2) {   // to account for a start-up bug
+
+      console.log("STOP MOVING");
+      Strike();
+    
+    }
+
+    startUp ++;
+  
+  }
+  
+  return motion;
+
+}
+
+function VisualizeMotion(motion) {
+  for (i = 0; i < motion.length; i++) {
+      
+    var m = motion[i];
+    context.fillStyle = "blue";
+    context.fillRect(m.x, m.y, sample_size, sample_size);
+    
+}
+}
+
+// ==== TooNoisy() ====
+//  - gives a strike if player is too noisy
+function TooNoisy() {
+
+  let vol = mic.getLevel();
+  if (vol > maxVol) {
+
+    if (strikes < strikesMax) { mySounds[strikes].play(); }   // HUSH
+    console.log("SHUT UP");
+    Strike();
+
+  }
+
+}
+
+// ==== Strike() ====
+//  - gives user a strike
+//  - small punishment by resetting
+//    strike "forgiveness" counter
+//  - setting warning to true starts
+//    strike cooldown
+function Strike() {
+
+  movie.pause();
+  warning = true;
+  strikes++;
+  strikeTime = 0;
+  cooldownTime = 0;
+  console.log("==== boy howdy, that's stike " + strikes + "! ====");
+
+}
+
+// ==== StrikeCooldown() ====
+//  - small invulnerability for player
+//  - prevents a barrage of strikes
+//  - will give a bit of leniance
+function StrikeCooldown() {
+
+  if (warning) {
+
+    strikeTime += deltaTime/1000;
+    
+    if (strikeTime > strikeTimeMax) {
+
+      warning = false;
+      movie.play();
+      strikeTime = 0;
+
+      console.log("back in the game!");
+
+    }
+
+  }
+
+}
+
+// ==== CREDITS ====
+// Sshh.wav - jay-kelly007 [1]
+//  - https://freesound.org/s/408744/
+//  - https://creativecommons.org/licenses/by-nc/3.0/
