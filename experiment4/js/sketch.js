@@ -35,10 +35,13 @@ let setupComplete;
 
 function preload() {
 
-  ssh1 = loadSound('./resources/ssh_01.mp3');
-  ssh2 = loadSound('./resources/ssh_02.mp3');
-  ssh3 = loadSound('./resources/ssh_03.mp3');
-  ssh4 = loadSound('./resources/ssh_04.mp3');
+  console.log("preload...");
+
+  ssh1 = loadSound('./resources/ssh01.mp3');
+  ssh2 = loadSound('./resources/ssh02.mp3');
+  ssh3 = loadSound('./resources/ssh03.mp3');
+  ssh4 = loadSound('./resources/ssh04.mp3');
+  console.log(" -- DONE! ^_^");
 
 }
 
@@ -76,7 +79,7 @@ function setup() {
 
 function draw() {
 
-  console.log("draw!");
+  //console.log("draw!");
 
   if (!setupComplete) { return; }
 
