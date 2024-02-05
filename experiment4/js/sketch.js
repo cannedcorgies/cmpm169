@@ -26,20 +26,27 @@ let video;
   let movementMax = 1000;
   let startUp = 0;
 
+let ssh1;
+let ssh2;
+let ssh3;
+let ssh4;
+
 let setupComplete;
 
 function preload() {
 
-  mySounds.push(loadSound('./resources/ssh_01.mp3'));
-  mySounds.push(loadSound('./resources/ssh_02.mp3'));
-  mySounds.push(loadSound('./resources/ssh_03.mp3'));
-  mySounds.push(loadSound('./resources/ssh_04.mp3'));
+  ssh1 = loadSound('./resources/ssh_01.mp3');
+  ssh2 = loadSound('./resources/ssh_02.mp3');
+  ssh3 = loadSound('./resources/ssh_03.mp3');
+  ssh4 = loadSound('./resources/ssh_04.mp3');
 
 }
 
 function setup() {
 
   console.log("setting up...");
+
+  mySounds = [ssh1, ssh2, ssh3, ssh4];
 
   setupComplete = false;
   
