@@ -45,10 +45,10 @@ function setup() {
     movie.play();
     
     // load audio files explicitly using loadSound
-    mySounds[0] = loadSound('resources/ssh_01.mp3', function() {
-      mySounds[1] = loadSound('resources/ssh_02.mp3', function() {
-        mySounds[2] = loadSound('resources/ssh_03.mp3', function() {
-          mySounds[3] = loadSound('resources/ssh_04.mp3', function() {
+    mySounds[0] = loadSound('experiment4/js/resources/ssh_01.mp3', function() {
+      mySounds[1] = loadSound('experiment4/js/resources/ssh_02.mp3', function() {
+        mySounds[2] = loadSound('experiment4/js/resources/ssh_03.mp3', function() {
+          mySounds[3] = loadSound('experiment4/js/resources/ssh_04.mp3', function() {
             mic = new p5.AudioIn();
             mic.start();
             video = createCapture(VIDEO);
