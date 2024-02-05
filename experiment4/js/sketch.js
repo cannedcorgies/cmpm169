@@ -44,7 +44,7 @@ function setup() {
   movie.elt.addEventListener('loadeddata', function() {
     movie.play();
     
-    // Load audio files explicitly using loadSound
+    // load audio files explicitly using loadSound
     mySounds[0] = loadSound('resources/ssh_01.mp3', function() {
       mySounds[1] = loadSound('resources/ssh_02.mp3', function() {
         mySounds[2] = loadSound('resources/ssh_03.mp3', function() {
