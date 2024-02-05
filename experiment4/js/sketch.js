@@ -41,29 +41,8 @@ function setup() {
   createCanvas(640, 480);
 
   movie = createVideo("resources/NightOfTheLivingDead.mp4");
-  movie.play();
-
-  mySounds[0] = loadSound('resources/ssh_01.mp3');
-  mySounds[1] = loadSound('resources/ssh_02.mp3');
-  mySounds[2] = loadSound('resources/ssh_03.mp3');
-  mySounds[3] = loadSound('resources/ssh_04.mp3');
-
-  mic = new p5.AudioIn();
-  mic.start();
-  video = createCapture(VIDEO);
-  video.size(640, 480);
-  video.hide();
-
-  context = canvas.getContext('2d');
-
-  old = [];
-  scalefactor = 1;
-            
-  setupComplete = true;
-  console.log("we're done!");
-
-  /*movie.elt.addEventListener('loadeddata', function() {
-    
+  movie.elt.addEventListener('loadeddata', function() {
+    movie.play();
     
     // load audio files explicitly using loadSound
     mySounds[0] = loadSound('resources/ssh_01.mp3', function() {
@@ -87,7 +66,7 @@ function setup() {
         });
       });
     });
-  });*/
+  });
 
 }
 
