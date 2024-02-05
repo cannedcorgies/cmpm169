@@ -30,14 +30,20 @@ let setupComplete;
 
 function preload() {
 
+  console.log("loading audio...");
+
   mySounds.push(loadSound('resources/ssh_01.mp3'));
     mySounds.push(loadSound('resources/ssh_02.mp3'));
     mySounds.push(loadSound('resources/ssh_03.mp3'));
     mySounds.push(loadSound('resources/ssh_04.mp3'));
 
+  console.log("audio loaded!");
+
 }
 
 function setup() {
+
+  console.log("setting up...");
 
   setupComplete = false;
   
@@ -70,6 +76,7 @@ function setup() {
   scalefactor = 1;
   
   setupComplete = true;
+  console.log("we're done!");
 
 }
 
