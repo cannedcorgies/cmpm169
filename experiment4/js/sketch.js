@@ -56,24 +56,21 @@ function setup() {
   createCanvas(640, 480);
 
   movie = createVideo("./resources/NightOfTheLivingDead.mp4");
-  movie.elt.addEventListener('loadeddata', function() {
-    movie.play();
+  movie.play();
     
-    mic = new p5.AudioIn();
-    mic.start();
-    video = createCapture(VIDEO);
-    video.size(640, 480);
-    video.hide();
+  mic = new p5.AudioIn();
+  mic.start();
+  video = createCapture(VIDEO);
+  video.size(640, 480);
+  video.hide();
 
-    context = canvas.getContext('2d');
+  context = canvas.getContext('2d');
 
-    old = [];
-    scalefactor = 1;
+  old = [];
+  scalefactor = 1;
             
-    setupComplete = true;
-    console.log("we're done!");
-
-  });
+  setupComplete = true;
+  console.log("we're done!");
 
 }
 
