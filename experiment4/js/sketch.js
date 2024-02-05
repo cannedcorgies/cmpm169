@@ -30,11 +30,6 @@ let setupComplete;
 
 function preload() {
 
-  mySounds.push(loadSound('resources/ssh_01.mp3'));
-  mySounds.push(loadSound('resources/ssh_02.mp3'));
-  mySounds.push(loadSound('resources/ssh_03.mp3'));
-  mySounds.push(loadSound('resources/ssh_04.mp3'));
-
 }
 
 function setup() {
@@ -49,20 +44,28 @@ function setup() {
   movie.elt.addEventListener('loadeddata', function() {
     movie.play();
     
-    mic = new p5.AudioIn();
-    mic.start();
-    video = createCapture(VIDEO);
-    video.size(640, 480);
-    video.hide();
+    // Load audio files explicitly using loadSound
+    mySounds[0] = loadSound('resources/ssh_01.mp3', function() {
+      mySounds[1] = loadSound('resources/ssh_02.mp3', function() {
+        mySounds[2] = loadSound('resources/ssh_03.mp3', function() {
+          mySounds[3] = loadSound('resources/ssh_04.mp3', function() {
+            mic = new p5.AudioIn();
+            mic.start();
+            video = createCapture(VIDEO);
+            video.size(640, 480);
+            video.hide();
 
-    context = canvas.getContext('2d');
+            context = canvas.getContext('2d');
 
-    old = [];
-    scalefactor = 1;
+            old = [];
+            scalefactor = 1;
             
-    setupComplete = true;
-    console.log("we're done!");
-    
+            setupComplete = true;
+            console.log("we're done!");
+          });
+        });
+      });
+    });
   });
 
 }
