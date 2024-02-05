@@ -84,9 +84,6 @@ function draw() {
 
   console.log("draw!");
 
-  //background(0);
-
-  //context.drawImage(video, 0, 0, 640, 480);
   image(video, 0, 0, width, height);
 
   if (!setupComplete) { return; }
