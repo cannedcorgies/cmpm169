@@ -49,34 +49,24 @@ function setup() {
   
   createCanvas(640, 480);
 
-  movie = createVideo("resources/NightOfTheLivingDead.mp4");
+  movie = createVideo("resources/NightOfTheLivingDead.mp4", function() {
+    // This function will be called once the video metadata is loaded
     movie.play();
-
-  mic = new p5.AudioIn();
+    mic = new p5.AudioIn();
     mic.start();
-
-  video = createCapture(VIDEO);
+    video = createCapture(VIDEO);
     video.size(640, 480);
     video.hide();
+
+    context = canvas.getContext('2d');
+
+    old = [];
+    scalefactor = 1;
     
-  // Initialize the previous frame
-  prevFrame = createImage(width, height);
-  prevFrame.loadPixels();
-  for (let i = 0; i < prevFrame.pixels.length; i += 4) {
-    prevFrame.pixels[i] = 0;
-    prevFrame.pixels[i + 1] = 0;
-    prevFrame.pixels[i + 2] = 0;
-    prevFrame.pixels[i + 3] = 255;
-  }
-  prevFrame.updatePixels();
+    setupComplete = true;
+    console.log("we're done!");
 
-  context = canvas.getContext('2d');
-
-  old = []
-  scalefactor = 1;
-  
-  setupComplete = true;
-  console.log("we're done!");
+  });
 
 }
 
@@ -84,10 +74,10 @@ function draw() {
 
   console.log("draw!");
 
-  image(video, 0, 0, width, height);
-
   if (!setupComplete) { return; }
 
+  image(video, 0, 0, width, height);
+  
   // ==== GAME OVER ====
   if (strikes > strikesMax) {   // if exceed strikes allowed..
 
