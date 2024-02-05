@@ -30,10 +30,10 @@ let setupComplete;
 
 function preload() {
 
-  mySounds.push(loadSound('resources/ssh_01.mp3'));
-  mySounds.push(loadSound('resources/ssh_02.mp3'));
-  mySounds.push(loadSound('resources/ssh_03.mp3'));
-  mySounds.push(loadSound('resources/ssh_04.mp3'));
+  mySounds.push(loadSound('./resources/ssh_01.mp3'));
+  mySounds.push(loadSound('./resources/ssh_02.mp3'));
+  mySounds.push(loadSound('./resources/ssh_03.mp3'));
+  mySounds.push(loadSound('./resources/ssh_04.mp3'));
 
 }
 
@@ -45,7 +45,7 @@ function setup() {
   
   createCanvas(640, 480);
 
-  movie = createVideo("resources/NightOfTheLivingDead.mp4");
+  movie = createVideo("./resources/NightOfTheLivingDead.mp4");
   movie.elt.addEventListener('loadeddata', function() {
     movie.play();
     
@@ -62,7 +62,7 @@ function setup() {
             
     setupComplete = true;
     console.log("we're done!");
-    
+
   });
 
 }
