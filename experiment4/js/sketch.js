@@ -37,10 +37,10 @@ function preload() {
 
   console.log("preload...");
 
-  ssh1 = loadSound('./resources/ssh01.mp3');
-  ssh2 = loadSound('./resources/ssh02.mp3');
-  ssh3 = loadSound('./resources/ssh03.mp3');
-  ssh4 = loadSound('./resources/ssh04.mp3');
+  ssh1 = loadSound('ssh01.mp3');
+  ssh2 = loadSound('ssh02.mp3');
+  ssh3 = loadSound('ssh03.mp3');
+  ssh4 = loadSound('ssh04.mp3');
   console.log(" -- DONE! ^_^");
 
 }
