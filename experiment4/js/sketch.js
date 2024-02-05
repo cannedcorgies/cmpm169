@@ -76,6 +76,8 @@ function draw() {
 
   if (!setupComplete) { return; }
 
+  console.log(" -- with set-up");
+
   image(video, 0, 0, width, height);
   
   // ==== GAME OVER ====
