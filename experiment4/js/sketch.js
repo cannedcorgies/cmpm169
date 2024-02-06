@@ -16,7 +16,7 @@ let maxVol = 0.0175;
 let video;
   let prevFrame;
   let currentFrame;
-  let camSensitivity = 50;
+  let camSensitivity = 40;
   let camWidth = 640;
   let camHeight = 480;
   let ctx;
@@ -55,7 +55,7 @@ function setup() {
   
   createCanvas(640, 480);
 
-  movie = createVideo("nightofthelivingdead.mp4");
+  movie = createVideo("newgirlsample.mp4");
   movie.play();
     
   mic = new p5.AudioIn();
