@@ -16,7 +16,7 @@ let maxVol = 0.0175;
 let video;
   let prevFrame;
   let currentFrame;
-  let camSensitivity = 40;
+  let camSensitivity = 100;
   let camWidth = 640;
   let camHeight = 480;
   let ctx;
