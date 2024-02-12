@@ -13,7 +13,7 @@ var maxVel_trail = 20;
 var deadVel = 0.5;
 var maxAge_trail = 40;
 var trailAvailable = false;
-  var maxTrailCooldown = 4;
+  var maxTrailCooldown = 1.5
   var minTrailCooldown = 0.5;
   var nextCooldown = 1;
   var trailCooldown = 0;
@@ -121,23 +121,27 @@ function draw() {
 
 function Explode(volume) {
   
-  if (trails.length > 0) {
+  for (var j = 0; j <= trails.length; j ++) {
 
-    var currTrail = trails[0];
-    var currPos = [currTrail.x, currTrail.y, currTrail.z];
-    var currColor = currTrail.color;
+      var currTrail = trails[0];
+      var currPos = [currTrail.x, currTrail.y, currTrail.z];
+      var currColor = currTrail.color;
 
-    trails.shift();
+      trails.shift();
 
-    var partCount = (round(volume/100)) * 200
+      var partCount = (round(volume/100)) * 200
 
-    for(var i = 0; i<partCount; i++){        // push 500 particles
-        
-      particles.push(new particle(volume, currPos, currColor));
-        
+      for(var i = 0; i < partCount; i ++){        // push 500 particles
+          
+        particles.push(new particle(volume, currPos, currColor));
+          
+      }
+
+      console.log("hm, sure");
+
     }
 
-  }
+   
   
 }
 
