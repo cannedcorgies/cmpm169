@@ -2,23 +2,26 @@ var particles = [];
 var maxAge = 40;
   var agingScale = 3;
   var distanceCutoff = 20;
+  var colorStep = 30;
 
 var trails = [];
-var originOffset = -400;
+var posScale = 100;
+  var originOffset = -4;
+  var offsetMax = 4;
 var maxVel_trail = 20;
   var minVel_trail = 5;
 var deadVel = 0.1;
 var maxAge_trail = 40;
 var trailAvailable = false;
   var maxTrailCooldown = 4;
-  var minTrailCooldown = 1;
+  var minTrailCooldown = 0.5;
   var nextCooldown = 1;
   var trailCooldown = 0;
 
 let mic;
   var boomDetected = false;
   var boomCLick = false;
-  var volumeCutoff = 70;
+  var volumeCutoff = 100;
   var volumeScaling = 10000;
   var volumeReduction = 500;
 
@@ -29,7 +32,6 @@ function setup() {
 	createCanvas(windowWidth, windowHeight, WEBGL);
 	background(100);
   
-	for(var i = 0; i<1000; i++){ particles.push(new particle);} // initial explosion
 	noStroke();
 
   mic = new p5.AudioIn();
@@ -40,7 +42,7 @@ function setup() {
 function draw() {
 	
   offset = 0;
-	background(51);
+	background(0);
 
 
   // ===== PARTICLES SYSTEM
@@ -69,7 +71,8 @@ function draw() {
 
       trailCooldown = 0;
       nextCooldown = random(minTrailCooldown, maxTrailCooldown);
-      trails.push(new trail());
+      var randStartPos = [int(random(-offsetMax, offsetMax)), int(random(-offsetMax, offsetMax))]
+      trails.push(new trail(randStartPos));
 
     }
 
@@ -110,7 +113,7 @@ function draw() {
 
     boomCLick = true;
     Explode(vol);
-    console.log("BOOM DETECTED");
+    console.log("BOOM DETECTED - " + vol);
 
   }
 
@@ -118,23 +121,35 @@ function draw() {
 
 function Explode(volume) {
   
-	for(var i = 0; i<500; i++){        // push 500 particles
-      
-		particles.push(new particle(volume));
-      
-	}
+  if (trails.length > 0) {
+
+    var currTrail = trails[0];
+    var currPos = [currTrail.x, currTrail.y, currTrail.z];
+    var currColor = currTrail.color;
+
+    trails.shift();
+
+    var partCount = (round(volume/100)) * 200
+
+    for(var i = 0; i<partCount; i++){        // push 500 particles
+        
+      particles.push(new particle(volume, currPos, currColor));
+        
+    }
+
+  }
   
 }
 
 class trail {
 
 
-  constructor() {
+  constructor(startPos) {
 
         // POSITION
-    this.x = 0;
-    this.y = -originOffset;
-    this.z = 0;
+    this.x = startPos[0] * posScale;
+    this.y = -originOffset * posScale;
+    this.z = startPos[1] * posScale;
      
         // VELOCITY
     this.vel = random(minVel_trail, maxVel_trail)
@@ -142,7 +157,10 @@ class trail {
     this.vel = 10;
      
         // AGE AND MISC
-    this.color = random(50, 255, 255);
+    var r = random(255); // r is a random number between 0 - 255
+    var g = random(255); // g is a random number betwen 100 - 200
+    var b = random(255); // b is a random number between 0 - 100
+    this.color = [r, g, b];
     this.ded = false;
      
   }
@@ -150,17 +168,15 @@ class trail {
   update(){
      
         // AGING
-        var distance = abs(this.x + this.y + this.z);
-     
     if(this.ded === false && this.vel < deadVel) { this.ded = true; console.log("DIED")}  // age limit
      
         // VELOCITY MODIFICATION
-    this.vel = this.vel * random(0.96, 1.001) //this.vel[0]*random(0.99, 1.001), this.vel[1]*random(0.99, 1.001), this.vel[2]*random(0.99, 1.001)];  // more organic velocity
+    this.vel = this.vel * random(0.96, 1.001)
     this.y -= this.vel;
      
         // coloring?
     if(this.color<240){
-      fill(255, this.color, 0);
+      fill(this.color[0], this.color[0], this.color[0]);
     }
     else{
       fill(this.color);
@@ -170,6 +186,7 @@ class trail {
     translate(this.x, this.y, this.z);
     sphere(10, 8, 4);
     translate(-this.x, -this.y, -this.z);
+    
   }
 
 
@@ -178,14 +195,14 @@ class trail {
 
 class particle{
   
-	constructor(volume){
+	constructor(volume, startPos, color){
       
     var velConst = volume/volumeReduction;
 
         // POSITION
-		this.x = 0;
-		this.y = 0;
-		this.z = 0;
+		this.x = startPos[0];
+		this.y = startPos[1];
+		this.z = startPos[2];
       
         // VELOCITY
 		this.vel = [random(-velConst, velConst), random(-velConst, velConst), random(-velConst, velConst)];
@@ -193,7 +210,25 @@ class particle{
 		this.vel = [this.vel[0]*this.total, this.vel[1]*this.total, this.vel[2]*this.total];
       
         // AGE AND MISC
-		this.color = random(50, 255, 255);
+		this.color = color;
+    this.primary = this.color[0];
+    this.primaryIndex = 0;
+    for (var i = 0; i < this.color.length; i++){
+
+      if (this.color[i] > this.color[this.primaryIndex]) {
+
+        this.primary = this.color[i];
+        this.primaryIndex = i;
+
+      }
+
+    }
+
+    this.color = [random(this.color[0] - colorStep, this.color[0 + colorStep]), 
+                  random(this.color[1] - colorStep, this.color[1 + colorStep]), 
+                  random(this.color[2] - colorStep, this.color[2 + colorStep])];
+    this.color[this.primaryIndex] = this.primary;
+
 		this.age = 0;
         this.maxAge = maxAge;
         this.ded = false;
@@ -203,12 +238,9 @@ class particle{
 	update(){
       
         // AGING
-        var distance = abs(this.x + this.y + this.z);
-      
 		this.age += random(0.2, 2);      // so that it sizzles...
 		if(this.ded === false && this.maxAge < this.age) { this.ded = true; }  // age limit
-        //if(this.ded === false && distance > distanceCutoff) { this.ded = true; }
-      
+        
         // VELOCITY MODIFICATION
 		this.vel = [this.vel[0]*random(0.99, 1.001), this.vel[1]*random(0.99, 1.001), this.vel[2]*random(0.99, 1.001)];  // more organic velocity
 		this.x += this.vel[0];
@@ -227,5 +259,6 @@ class particle{
 		translate(this.x, this.y, this.z);
 		sphere(10, 8, 4);
 		translate(-this.x, -this.y, -this.z);
+
 	}
 }
