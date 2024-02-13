@@ -11,7 +11,7 @@ let strikes = 0;
 let cooldownTime = 0;
   let cooldownTimeMax = 15;
 
-let maxVol = 0.0175;
+let maxVol = 0.0085;
 
 let video;
   let prevFrame;
@@ -46,6 +46,8 @@ function preload() {
 }
 
 function setup() {
+
+  warning = true;
 
   console.log("setting up...");
 
