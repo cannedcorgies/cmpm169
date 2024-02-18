@@ -1,67 +1,98 @@
-// sketch.js - purpose and description here
-// Author: Your Name
-// Date:
+let fallingLetters = [];
+let ripples = [];
+let font;
+let surfaceHeight = 400
 
-// Here is how you might set up an OOP p5.js project
-// Note that p5.js looks for a file called sketch.js
-
-// Constants - User-servicable parts
-// In a longer project I like to put these in a separate file
-const VALUE1 = 1;
-const VALUE2 = 2;
-
-// Globals
-let myInstance;
-let canvasContainer;
-
-class MyClass {
-    constructor(param1, param2) {
-        this.property1 = param1;
-        this.property2 = param2;
-    }
-
-    myMethod() {
-        // code to run when method is called
-    }
+function preload() {
+  font = loadFont('MOgent.otf'); // Replace with the path to your font file
 }
 
-// setup() function is called once when the program starts
 function setup() {
-    // place our canvas, making it fit our container
-    canvasContainer = $("#canvas-container");
-    let canvas = createCanvas(canvasContainer.width(), canvasContainer.height());
-    canvas.parent("canvas-container");
-    // resize canvas is the page is resized
-    $(window).resize(function() {
-        console.log("Resizing...");
-        resizeCanvas(canvasContainer.width(), canvasContainer.height());
-    });
-    // create an instance of the class
-    myInstance = new MyClass(VALUE1, VALUE2);
-
-    var centerHorz = windowWidth / 2;
-    var centerVert = windowHeight / 2;
+  createCanvas(800, 800, WEBGL);
+  textFont(font);
+  angleMode(DEGREES);
 }
 
-// draw() function is called repeatedly, it's the main animation loop
 function draw() {
-    background(220);    
-    // call a method on the instance
-    myInstance.myMethod();
+  background(220);
+  textAlign(CENTER, CENTER);
+  textSize(32);
+  fill(0);
+  rotateX(-45);
 
-    // Put drawings here
-    var centerHorz = canvasContainer.width() / 2 - 125;
-    var centerVert = canvasContainer.height() / 2 - 125;
-    fill(234, 31, 81);
-    noStroke();
-    rect(centerHorz, centerVert, 250, 250);
-    fill(255);
-    textStyle(BOLD);
-    textSize(140);
-    text("p5*", centerHorz + 10, centerVert + 200);
+  // Update and display ripples
+  for (let i = ripples.length - 1; i >= 0; i--) {
+    ripples[i].update();
+    ripples[i].display();
+    if (ripples[i].alpha <= 0) {
+      ripples.splice(i, 1);
+    }
+  }
+
+  // Update and display falling letters
+  for (let i = fallingLetters.length - 1; i >= 0; i--) {
+    fallingLetters[i].update();
+    fallingLetters[i].display();
+
+    // Check if the letter has reached its limit
+    if (fallingLetters[i].y > surfaceHeight) {
+      // Create a ripple at the landing position
+      let newRipple = new Ripple(fallingLetters[i].x, fallingLetters[i].z);
+      ripples.push(newRipple);
+
+      // Remove the letter
+      fallingLetters.splice(i, 1);
+    }
+  }
 }
 
-// mousePressed() function is called once after every time a mouse button is pressed
-function mousePressed() {
-    // code to run when mouse is pressed
+function keyPressed() {
+  let newLetter = new FallingLetter(key, random(-width/2, width/2), -height/2, random(-width/2, width/2));
+  fallingLetters.push(newLetter);
+}
+
+class FallingLetter {
+  constructor(letter, x, y, z) {
+    this.letter = letter;
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.speed = random(5, 7);
+  }
+
+  update() {
+    this.y += random(this.speed - 2, this.speed + 2);
+  }
+
+  display() {
+    push();
+    translate(this.x, this.y, this.z);
+    text(this.letter, 0, 0);
+    pop();
+  }
+}
+
+class Ripple {
+  constructor(x, z) {
+    this.x = x;
+    this.y = surfaceHeight
+    this.z = z;
+    this.radius = 1;
+    this.alpha = 255;
+  }
+
+  update() {
+    this.radius += 5;
+    this.alpha -= 2;
+  }
+
+  display() {
+    push();
+    translate(this.x, surfaceHeight, this.z); 
+    rotateX(90); // Face the screen
+    fill(0, this.alpha);
+    noFill();
+    ellipse(0, 0, this.radius * 2);
+    pop();
+  }
 }
