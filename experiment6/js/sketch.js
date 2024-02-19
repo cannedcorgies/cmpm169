@@ -5,7 +5,7 @@ let surfaceHeight = 400
 
 function preload() {
 
-  font = loadFont('MOgent.otf');
+  font = loadFont('Mogent.otf');
 
 }
 
@@ -23,7 +23,7 @@ function draw() {
   textAlign(CENTER, CENTER);
   textSize(32);
   fill(0);
-  rotateX(-45);
+  rotateX(0);
 
   // ==== UPDATE RIPLLES
   for (let i = ripples.length - 1; i >= 0; i--) {
